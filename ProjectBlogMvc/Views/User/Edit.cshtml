@@ -1,0 +1,64 @@
+﻿@model ProjectBlogMvc.Models.DATA.Entities.User
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+<div class="container mt-5 text-left">
+    <h2>Profil Düzenle</h2>
+    <div class="row">
+        <div class="col-sm-8">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="ID" />
+                <div class="form-group float-label-control">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <br />
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="FirstName" class="control-label"></label>
+                    <br />
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="LastName" class="control-label"></label>
+                    <br />
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="Email" class="control-label"></label>
+                    <br />
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="Bio" class="control-label"></label>
+                    <br />
+                    <input asp-for="Bio" class="form-control" />
+                    <span asp-validation-for="Bio" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="URL" class="control-label"></label>
+                    <br />
+                    <input asp-for="URL" class="form-control" />
+                    <span asp-validation-for="URL" class="text-danger"></span>
+                </div>
+                <div class="form-group float-label-control">
+                    <label asp-for="ProfilPicture" class="control-label"></label>
+                    <br />
+                    <input asp-for="ProfilPicture" class="form-control" />
+                    <span asp-validation-for="ProfilPicture" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+

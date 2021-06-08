@@ -1,0 +1,149 @@
+﻿@model Tuple<Article, User, List<Topic>, List<Article>, List<ArticlesTopics>>
+@{
+    ViewData["Title"] = "Post";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    List<Topic> relatedTopics = new List<Topic>();
+
+    foreach (var item in Model.Item5.Where(x => x.ArticleID == Model.Item1.ID).ToList())
+    {
+        Topic topics = Model.Item3.AsQueryable().Where(x => x.ID == item.TopicID).FirstOrDefault();
+        relatedTopics.Add(topics);
+    }
+
+}
+<!--<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="post-heading post-header">
+                    <h1>Model.Item1.Title</h1>
+                    <h2 class="subheading">Model.Item1.Description</h2>
+                    <span class="meta">
+                        <img class="post-user-picture" src="Model.Item2.ProfilPicture" />
+                        <a class="ml-3" href="#!">Model.Item2.FirstName Model.Item2.LastName </a>
+                        <strong>.</strong>
+                        Model.Item1.ReleaseDate.ToString("MMMM dd")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<article>
+    <div class="container-fluid text-center">
+        <img src="Model.Item1.Picture" class="post-image" />
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 mx-auto">
+
+                <blockquote class="post-content text-justify"> Html.Raw(Model.Item1.Content)</blockquote>
+            </div>
+        </div>
+    </div>
+</article>
+<hr />-->
+<!--<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <ul class="list-inline text-center">
+                    <li class="list-inline-item">
+                        <a class="post-footer display-2" href="#!">
+                            <i class="fas fa-book-open"></i> Model.Item1.HitRate
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="post-footer display-2" href="#!">
+                            <i class="fas fa-clock"></i> Model.Item1.ReadingTime
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="post-footer display-2" href="#!">
+                            <i class="fas fa-hashtag"></i>
+                            foreach (var item in Model.Item3.ToList())
+                            {
+                                item.Name;
+                            }
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>-->
+<header class="masthead">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="post-heading post-header">
+                    <h1>@Model.Item1.Title</h1>
+                    <h2 class="subheading">@Model.Item1.Description</h2>
+                    <span class="meta">
+                        <img class="post-user-picture" src="@Model.Item2.ProfilPicture" />
+                        <a asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@Model.Item2.ID" class="ml-3" >@Model.Item2.FirstName @Model.Item2.LastName </a>
+                        <strong>.</strong>
+                        @Model.Item1.ReleaseDate.ToString("MMMM dd")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<article>
+    <div class="container-fluid text-center">
+        <img src="@Model.Item1.Picture" class="post-image" />
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 mx-auto">
+
+                <blockquote class="post-content text-justify mt-3">@Html.Raw(Model.Item1.Content)</blockquote>
+            </div>
+        </div>
+    </div>
+</article>
+<hr />
+<!-- Footer-->
+<footer>
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-6 col-md-10 mx-auto">
+                <ul class="list-inline text-center">
+                    <li class="list-inline-item">
+                        <a class="post-footer display-4" href="#!">
+                            <i class="fas fa-book-open"></i> @Model.Item1.HitRate
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="post-footer display-4 " href="#!">
+                            <i class="fas fa-clock"></i> @Model.Item1.ReadingTime
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6 col-md-10 mx-auto">
+                <ul>
+                    <li class="list-inline-item">
+                        <a class="post-footer display-4" href="#!">
+                            <div class="row ml-2">
+                                <i class="fas fa-hashtag"></i>
+                                @foreach (var item in relatedTopics)
+                                {
+                                    <div col-3 class="border">
+                                       &nbsp; @item.Name &nbsp;
+                                    </div>
+                                }
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</footer>

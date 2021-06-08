@@ -1,0 +1,266 @@
+﻿@model Tuple<List<User>, List<Article>, List<Topic>, List<UsersTopics>, List<FollowerFollowed>, List<ArticlesTopics>, List<UsersArticles>>
+@using System.Globalization;
+
+
+@{
+    ViewData["Title"] = "Index";
+    string email = ViewBag.Email;
+    ViewData["Email"] = email;
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    User user = Model.Item1.AsQueryable().Where(x => x.Email == email).FirstOrDefault();
+    int getID = Model.Item1.AsQueryable().Where(x => x.Email == email.ToString()).Select(x => x.ID).FirstOrDefault();
+    List<Article> articles = Model.Item2.AsQueryable().OrderByDescending(x => x.ReleaseDate).Where(x => x.UserID == getID).ToList();
+    List<Article> articlesAll = Model.Item2.AsQueryable().OrderByDescending(x => x.ReleaseDate).ToList();
+    List<Topic> topics = Model.Item3.AsQueryable().Take(4).ToList();
+    List<int> followeds = Model.Item5.Where(x => x.FollowerID == getID).Select(x => x.FollowedID).ToList();
+    List<int> followers = Model.Item5.Where(x => x.FollowedID == getID).Select(x => x.FollowerID).ToList();
+    List<FollowerFollowed> followedsList = Model.Item5.Where(x => x.FollowerID == getID).ToList();
+    List<FollowerFollowed> followersList = Model.Item5.Where(x => x.FollowedID == getID).ToList();
+    Article topArticle = Model.Item2.AsQueryable().OrderByDescending(x => x.HitRate).Take(1).FirstOrDefault();
+    int topArticleUserID = Model.Item2.AsQueryable().OrderByDescending(x => x.HitRate).Take(1).Select(x => x.UserID).FirstOrDefault();
+    User topArticleUser = Model.Item1.AsQueryable().Where(x => x.ID == topArticleUserID).FirstOrDefault();
+}
+
+<div class="sticky-top" style="width:100px !important">
+    <div class="col-lg-4">
+        <header class="header">
+            <div class="details">
+                <img src="@user.ProfilPicture" alt="@user.UserName" class="profile-pic">
+                <h1 class="heading">@user.UserName</h1>
+                <div class="location">
+                    @*<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12 ,2Z"></path>
+                        </svg>*@
+                    <i class="fas fa-signature" style="width:18px;height:18px;"></i>
+                    <p>@user.FirstName @user.LastName</p>
+                </div>
+                <div class="stats">
+                    <div class="col-4">
+                        <h4>@articles.Count()</h4>
+                        <p class="profile-text">Makale Sayısı</p>
+                    </div>
+                    <div class="col-4">
+                        <h4> @followeds.Count()</h4>
+                        <a style="text-decoration:none !important;cursor:pointer" data-toggle="modal" data-target="#FollowedsModal"><p class="profile-text">Takip Edilenler</p></a>
+                    </div>
+                    <div class="col-4">
+                        <h4>@followers.Count()</h4>
+                        <a style="text-decoration: none !important;cursor: pointer" data-toggle="modal" data-target="#FollowersModal"><p class="profile-text">Takipçiler</p></a>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+</div>
+
+<!-- #region Modals -->
+<div class="modal fade" id="FollowedsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Takip Edilenler</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @foreach (var item in followedsList)
+                {
+                    <a class="text-decoration-none" style="cursor:pointer" asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@item.FollowedID">
+                        <p>
+                            <img style="width:50px;height:50px" src="@Model.Item1.AsQueryable().Where(x => x.ID == item.FollowedID).Select(x => x.ProfilPicture).FirstOrDefault()" />
+                            <strong style="color:#7E4D72" class="ml-2">@Model.Item1.AsQueryable().Where(x => x.ID == item.FollowedID).Select(x => x.UserName).FirstOrDefault()</strong>
+                        </p>
+                    </a>
+                    <hr />
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="FollowersModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Takipçiler</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @foreach (var item in followersList)
+                {
+                    <a class="text-decoration-none" style="cursor:pointer" asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@item.FollowerID">
+                        <p>
+                            <img style="width:50px;height:50px" src="@Model.Item1.AsQueryable().Where(x => x.ID == item.FollowerID).Select(x => x.ProfilPicture).FirstOrDefault()" />
+                            <strong style="color:#7E4D72" class="ml-2"> @Model.Item1.AsQueryable().Where(x => x.ID == item.FollowerID).Select(x => x.UserName).FirstOrDefault()</strong>
+                        </p>
+                    </a>
+                    <hr />
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- #endregion -->
+
+
+<section class="blog-posts">
+    <div class="container post-main">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="all-blog-posts">
+                    <div class="row">
+                        @foreach (var item in articlesAll)
+                        {
+                            System.Text.RegularExpressions.Regex rx = new System.Text.RegularExpressions.Regex("<[^>]*>");
+                            string content = rx.Replace(item.Content, "");
+                            content = content.Replace("&nbsp", "");
+                            string[] sentences = content.Split('.');
+                            string paragraph = "";
+                            if (sentences.Count() > 5)
+                            {
+                                for (int i = 0; i < 5; i++)
+                                    paragraph += sentences[i] + ".";
+
+                            }
+
+                            <div class="col-lg-12">
+                                <div class="blog-post">
+                                    <div class="blog-thumb">
+                                        <img src="@item.Picture" alt="">
+                                    </div>
+                                    <div class="down-content">
+                                        <span class="font-weight-bolder">
+                                            <a class="text-decoration-none" style="cursor: pointer;color: #F48840 !important" asp-controller="User" asp-action="Post" asp-route-id="@item.ID">@item.Title</a>
+                                        </span>
+                                        <a class="text-decoration-none" style="cursor:pointer" asp-controller="User" asp-action="Post" asp-route-id="@item.ID"><h4>@item.Description</h4></a>
+                                        <ul class="post-info" style="margin-left:-40px !important">
+                                            <li><a asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@item.UserID"><img class="mini-writer-img" src="@Model.Item1.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.ProfilPicture).FirstOrDefault()" /></a></li>
+                                            <li><a a asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@item.UserID" style="text-decoration:none !important; cursor:pointer">@Model.Item1.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault()</a></li>
+                                            <li><a style="text-decoration:none !important; cursor:none">@item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year</a></li>
+                                            <li><a style="text-decoration:none !important; cursor:none">@item.ReadingTime dk</a></li>
+                                        </ul>
+                                        @if (paragraph != "")
+                                        {
+                                            <p>@paragraph</p>
+                                        }
+                                        else
+                                        {
+                                            <p>@Html.Raw(item.Content)</p>
+                                        }
+                                        <div class="post-options">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <ul class="post-tags">
+                                                        <li><i class="fa fa-tags"></i></li>
+                                                        @foreach (var topic in Model.Item6.AsQueryable().Where(x => x.ArticleID == item.ID).Select(x => x.TopicID).ToList())
+                                                        {
+                                                            <li><a asp-controller="Article" asp-action="ArticlesRelatedTopic" asp-route-id="@topic" class="border">&nbsp;@Model.Item3.AsQueryable().Where(x => x.ID == topic).Select(x => x.Name).FirstOrDefault()&nbsp;</a></li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="post-share">
+                                                        @if (Model.Item7.AsQueryable().Where(x => x.UserID == getID && x.ArticleID == item.ID).FirstOrDefault() == null)
+                                                        {
+                                                            <li><a asp-controller="User" asp-action="FollowArticle" asp-route-url="@ViewBag.url" asp-route-id="@item.ID"><i class="far fa-bookmark"></i></a></li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li><a asp-controller="User" asp-action="UnFollowArticle" asp-route-url="@ViewBag.url" asp-route-id="@item.ID"><i class="fas fa-bookmark"></i></a></li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="main-popular-underline" />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="sidebar-item search">
+                                <form id="search_form" name="gs" method="GET" action="List">
+                                    <input type="text" name="searchString" class="searchText" placeholder="Aratın..." autocomplete="on">
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="sidebar-item recent-posts">
+                                <div class="sidebar-heading">
+                                    <h2>En Son Çıkan Makaleler</h2>
+                                </div>
+                                <div class="content">
+                                    <ul>
+                                        @foreach (var item in articlesAll.Take(5))
+                                        {
+                                            <li>
+                                                <a class="text-decoration-none" style="cursor:pointer" asp-controller="User" asp-action="Post" asp-route-id="@item.ID">
+                                                    <h5>@item.Title</h5>
+                                                    <span>@item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year</span>
+                                                </a>
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-lg-12">
+                                <div class="sidebar-item categories">
+                                    <div class="sidebar-heading">
+                                        <h2>Konular</h2>
+                                    </div>
+                                    <div class="content">
+                                        <ul>
+                                            @foreach (var item in Model.Item3.Take(5).ToList())
+                                            {
+                                                <li><a href="#">@item.Name</a></li>
+                                            }
+                                        </ul>
+                                        <a asp-controller="User" asp-action="AllTopics">Bütün Konuları Gör</a>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="col-lg-12">
+                            <div class="sidebar-item tags">
+                                <div class="sidebar-heading">
+                                    <h2>Takip Edilen Konular</h2>
+                                </div>
+                                <div class="content">
+                                    <ul>
+                                        @foreach (var item in Model.Item4.AsQueryable().Where(x => x.UserID == getID).ToList())
+                                        {
+                                            <li><a asp-controller="Article" asp-action="ArticlesRelatedTopic" asp-route-id="@item.TopicID">@Model.Item3.AsQueryable().Where(x => x.ID== item.TopicID).Select(x => x.Name).FirstOrDefault()</a></li>
+                                        }
+
+                                    </ul>
+                                    <a class="btn btn-success" asp-controller="User" asp-action="AllTopics">Bütün Konuları Gör</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

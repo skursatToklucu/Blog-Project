@@ -1,0 +1,45 @@
+﻿@model Tuple<List<Topic>, List<UsersTopics>>
+@{
+    ViewData["Title"] = "AllTopics";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    int userID = ViewBag.UserID;
+
+}
+
+<div class="container">
+    <div class="row">
+
+        @foreach (var item in Model.Item1)
+        {
+            <div class="col-lg-6 mt-2">
+                <div class="card-deck">
+                    <div class="card topic-cards">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md6">
+                                    <a asp-controller="Article" asp-action="ArticlesRelatedTopic" asp-route-id="@item.ID"  style="text-decoration:none !important; cursor:pointer"><h5 class="card-title mt-3"><strong>@item.Name</strong></h5></a>
+                                </div>
+                                @if (Model.Item2.AsQueryable().Where(x => x.UserID == userID && x.TopicID == item.ID).FirstOrDefault() == null)
+                                {
+                                    <div class="col-md-6">
+                                        <a asp-controller="User" asp-action="FollowTopic" asp-route-id="@item.ID"><i class="fas fa-plus-square fa-3x" style="color:darkgreen"></i></a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-6">
+                                        <a asp-controller="User" asp-action="UnFollowTopic" asp-route-id="@item.ID"><i class="fas fa-minus-square fa-3x" style="color:darkred"></i></a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <img src="~/topicImages/@item.ID.ToString()t.jpg" class="card-img-top" alt="..." style="height:300px;">
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+

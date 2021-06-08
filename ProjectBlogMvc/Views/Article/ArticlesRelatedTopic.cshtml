@@ -1,0 +1,89 @@
+﻿@model Tuple<List<Article>, List<User>, List<ArticlesTopics>, Topic, List<UsersArticles>>
+@{
+    ViewData["Title"] = "ArticlesRelatedTopic";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    int getUserID = ViewBag.getUserID;
+}
+
+<section class="blog-posts">
+    <div class="container post-main" style="margin-top:40px !important">
+        <h4><strong>@Model.Item4.Name ile ilgili Makaleler</strong></h4>
+        <hr class="main-popular-underline" />
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="all-blog-posts">
+                    <div class="row">
+                        @foreach (var item in Model.Item1)
+                        {
+                            System.Text.RegularExpressions.Regex rx = new System.Text.RegularExpressions.Regex("<[^>]*>");
+                            string content = rx.Replace(item.Content, "");
+                            content = content.Replace("&nbsp", "");
+                            string[] sentences = content.Split('.');
+                            string paragraph = "";
+                            if (sentences.Count() > 5)
+                            {
+                                for (int i = 0; i < 5; i++)
+                                    paragraph += sentences[i] + ".";
+
+                            }
+
+                            <div class="col-lg-12">
+                                <div class="blog-post">
+                                    <div class="blog-thumb">
+                                        <img src="@item.Picture" alt="">
+                                    </div>
+                                    <div class="down-content">
+                                        <span asp-controller="User" asp-action="Post" asp-route-id="@item.ID">@item.Title</span>
+                                        <a asp-controller="User" asp-action="Post" asp-route-id="@item.ID"><h4>@item.Description</h4></a>
+                                        <ul class="post-info">
+                                            <li><a asp-controller="User" asp-action="WriterProfile" asp-route-url="@ViewBag.url" asp-route-id="@item.UserID"><img class="mini-writer-img" src="@Model.Item2.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.ProfilPicture).FirstOrDefault()" /></a></li>
+                                            <li><a style="text-decoration:none !important">@Model.Item2.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault()</a></li>
+                                            <li><a style="text-decoration:none !important">@item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year</a></li>
+                                            <li><a style="text-decoration:none !important">@item.ReadingTime dk</a></li>
+                                        </ul>
+                                        @if (paragraph != "")
+                                        {
+                                            <p>@paragraph</p>
+                                        }
+                                        else
+                                        {
+                                            <p>@Html.Raw(item.Content)</p>
+                                        }
+                                        <div class="post-options">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <ul class="post-tags">
+                                                        <li><i class="fa fa-tags"></i></li>
+                                                        @foreach (var topic in Model.Item3.AsQueryable().Where(x => x.ArticleID == item.ID).Select(x => x.TopicID).ToList())
+                                                        {
+                                                            <li><a href="#" class="border">@Model.Item4.Name</a></li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="post-share">
+                                                        @if (Model.Item5.AsQueryable().Where(x => x.UserID == getUserID && x.ArticleID == item.ID).FirstOrDefault() == null)
+                                                        {
+                                                            <li><a asp-controller="User" asp-action="FollowArticle" asp-route-url="@ViewBag.url" asp-route-id="@item.ID"><i class="far fa-bookmark"></i></a></li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li><a asp-controller="User" asp-action="FollowArticle" asp-route-url="@ViewBag.url" asp-route-id="@item.ID"><i class="fas fa-bookmark"></i></a></li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="main-popular-underline" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

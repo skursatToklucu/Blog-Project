@@ -1,0 +1,158 @@
+﻿@model ProjectBlogMvc.Models.DATA.Entities.User
+
+@{
+    ViewData["Title"] = "WriterProfile";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    List<Article> articles = ViewBag.Articles;
+    List<Topic> topics = ViewBag.RelatedTopics;
+}
+@*<div class="container mt-5">
+        <div>
+            <dl class="row">
+
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.UserName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.UserName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.FirstName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.LastName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.LastName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Bio)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Bio)
+                </dd>
+
+            </dl>
+        </div>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.ID">Follow</a> |
+        </div>
+    </div>*@
+
+<div class="container bg-white">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-inverse mt-2" border-color: #333;">
+                <div class="card-block">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-8 text-center mt-5">
+                            <h2 class="card-title">@Model.UserName</h2>
+                            <p class="card-text"><strong>Ad Soyad:</strong> @Model.FirstName @Model.LastName </p>
+                            <p class="card-text"><strong>Hakkında: </strong>@Model.Bio </p>
+                            <p>
+                                <strong>Makaleler : </strong>
+                                @foreach (var item in articles)
+                                {
+                                    <a class="badge text-black-50">@item.Title</a>
+                                }
+                            </p>
+                            @*<h2><strong> @Model.HitRate </strong></h2>
+                            <p><small>Görüntülenme Sayısı</small></p>*@
+                            <br />
+
+                            @if (ViewBag.IsFollow == true)
+                            {
+                                <a asp-controller="User" asp-action="UnFollowWriter" asp-route-url="@ViewBag.url" asp-route-id="@Model.ID" class="btn btn-outline-danger mb-4 form-control" style="width:150px">Takibi Bırak</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="User" asp-action="FollowWriter" asp-route-url="@ViewBag.url" asp-route-id="@Model.ID" class="btn btn-outline-success mb-4 form-control" style="width:150px">Takip Et</a>
+                            }
+                        </div>
+                        <div class="col-md-4 col-sm-4 text-center">
+                            <img class="btn-lg" src="@Model.ProfilPicture" alt="" style="border-radius:50%;width:auto;height:304px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="blog-posts" style="margin-top: 300px !important; margin-left:-200px">
+    <div class="container-fluid post-main">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="all-blog-posts">
+                    <div class="row">
+                        <h1 class="ml-5 font-weight-bold">Bu yazara ait Makaleler</h1>
+                        <hr />
+
+                        @foreach (var item in articles)
+                        {
+                            System.Text.RegularExpressions.Regex rx = new System.Text.RegularExpressions.Regex("<[^>]*>");
+                            string content = rx.Replace(item.Content, "");
+                            content = content.Replace("&nbsp", "");
+                            string[] sentences = content.Split('.');
+                            string paragraph = "";
+                            if (sentences.Count() > 5)
+                            {
+                                for (int i = 0; i < 5; i++)
+                                    paragraph += sentences[i] + ".";
+
+                            }
+
+                            <div class="col-lg-12 mt-2">
+                                <div class="blog-post">
+                                    <div class="blog-thumb">
+                                        <img src="@item.Picture" alt="">
+                                    </div>
+                                    <div class="down-content">
+                                        <span asp-controller="User" asp-action="Post" asp-route-id="@item.ID">@item.Title</span>
+                                        <a asp-controller="User" asp-action="Post" asp-route-id="@item.ID"><h4>@item.Description</h4></a>
+                                        <ul class="post-info">
+                                            <li><a style="text-decoration:none !important">@item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year</a></li>
+                                            <li><a style="text-decoration:none !important">@item.ReadingTime dk</a></li>
+                                        </ul>
+                                        @if (paragraph != "")
+                                        {
+                                            <p>@paragraph</p>
+                                        }
+                                        else
+                                        {
+                                            <p>@item.Content</p>
+                                        }
+                                        <div class="post-options">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <ul class="post-tags">
+                                                        <li><i class="fa fa-tags"></i></li>
+                                                        @foreach (var topic in topics)
+	{
+                                                    <li><a href="#" class="border">@topic.Name</a></li>
+	}
+                                                    </ul>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="post-share">
+                                                        <li><i class="fa fa-share-alt"></i></li>
+                                                        <li><a href="#">Facebook</a>,</li>
+                                                        <li><a href="#"> Twitter</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="main-popular-underline" />
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

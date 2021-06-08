@@ -1,0 +1,113 @@
+﻿@model Tuple<List<User>, List<Article>, List<Topic>>
+
+<header class="masthead" style="background-image: url('assets/img/home-bg.jpg')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1>Düşüncelerini açığa çıkardığın yer</h1>
+                    <span class="subheading">Hemen hemen her konuda yeni balış açıları okuyun ve paylaşın</span>
+                    <span class="subheading">
+                        Herkese açığız.
+                        <a id="daha-fazla-bilgi" href="~/Home/About">Daha fazla bilgi edinin</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid ml-5">
+    <div class="row">
+        <div class="col-lg-6 col-md-8col-sm-8">
+            <h1 class="font-weight-bolder">POPÜLER MAKALELER</h1>
+            <hr class="main-popular-underline" />
+            @foreach (var item in Model.Item2.AsQueryable().OrderByDescending(x => x.HitRate).Take(5).ToList())
+            {
+                int id = item.UserID;
+                <div class="post-preview">
+                    <a asp-controller="Home" asp-action="HomePost" asp-route-id="@item.ID">
+                        <h2 class="post-title font-weight-bolder" title="Ortalama okunma süresi @item.ReadingTime dk">@item.Title</h2>
+                        <h3 class="post-subtitle">@item.Description</h3>
+                    </a>
+                    <p class="post-meta">
+                        <a style="cursor:pointer" data-toggle="modal" data-target="#MoreModal"><img class="mini-writer-img" src="@Model.Item1.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.ProfilPicture).FirstOrDefault()" /></a>
+                        <a style="cursor:pointer" data-toggle="modal" data-target="#MoreModal">@Model.Item1.AsQueryable().Where(x => x.ID == id).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault()</a>
+                        -@item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year
+                    </p>
+                </div>
+                <hr class="main-popular-writer-underline" />
+            }
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1"></div>
+        <div class="col-lg-4 col-md-2 col-sm-2">
+            <div class="sticky-top">
+                <h3 class="mt-5 ml-5 font-weight-bold mb-3">SİZİN İÇİN ÖNEMLİ OLAN DAHA FAZLASINI SEÇİN</h3>
+                @foreach (var item in Model.Item3.AsQueryable().OrderByDescending(x => x.HitRate).Take(10).ToList())
+                {
+                    <button data-toggle="modal" data-target="#MoreModal" class="btn btn-outline-dark mb-3 mr-3">@item.Name</button>
+                }
+                <br />
+                <a style="text-decoration: none !important;cursor: pointer" data-toggle="modal" data-target="#MoreModal" class="main-topic-more" href="">Bütün Konuları Gör</a>
+                <hr />
+            </div>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 ">
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid ml-5">
+    <div class="row">
+        <div class="col-lg-6 col-md-8col-sm-8">
+            <h1 class="font-weight-bolder">RASTGELE MAKALELER</h1>
+            <hr class="main-popular-underline" />
+            @foreach (var item in Model.Item2.AsQueryable().OrderBy(x => x.ReleaseDate).Take(5).ToList())
+            {
+                int id = item.UserID;
+                <div class="post-preview">
+                    <a asp-controller="Home" asp-action="HomePost" asp-route-id="@item.ID">
+                        <h2 class="post-title font-weight-bolder" title="Ortalama okunma süresi @item.ReadingTime dk">@item.Title</h2>
+                        <h3 class="post-subtitle">@item.Description</h3>
+                    </a>
+                    <p class="post-meta">
+                        <a style="cursor:pointer" data-toggle="modal" data-target="#MoreModal"><img class="mini-writer-img" src="@Model.Item1.AsQueryable().Where(x => x.ID == item.UserID).Select(x => x.ProfilPicture).FirstOrDefault()" /></a>
+                        <a style="cursor:pointer" data-toggle="modal" data-target="#MoreModal">@Model.Item1.AsQueryable().Where(x => x.ID == id).Select(x => x.FirstName + " " + x.LastName).FirstOrDefault()</a>
+                        - @item.ReleaseDate.ToString("MMMM dd"), @item.ReleaseDate.Year
+                    </p>
+                </div>
+                <hr class="main-popular-writer-underline" />
+            }
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="MoreModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Bilgi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <a>
+                    <p>
+                        İçeriği Görüntülemek İçin Lütfen Üye Olunuz
+                    </p>
+                </a>
+
+            </div>
+            <div class="modal-footer">
+                <a asp-controller="Home" asp-action="Sign" class="btn btn-success">
+                    Üye ol
+                </a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
